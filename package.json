@@ -1,0 +1,32 @@
+{
+  "name": "vue-app-setup",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "gulp"
+  },
+  "author": "Diego Morales <diego.morales@gmx.net>",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "browser-sync": "^2.23.6",
+    "del": "^3.0.0",
+    "gulp": "^4.0.0",
+    "gulp-modernizr": "^2.0.0",
+    "gulp-uglify": "^3.0.0",
+    "html-webpack-plugin": "^2.30.1",
+    "vue": "^2.5.13",
+    "vue-loader": "^14.1.1",
+    "vue-router": "^3.0.1",
+    "webpack": "^3.10.0",
+    "webpack-dev-middleware": "^2.0.5",
+    "webpack-hot-middleware": "^2.21.0",
+    "yargs": "^11.0.0"
+  },
+  "dependencies": {
+    "mdn-polyfills": "^5.5.0",
+    "normalize.css": "^8.0.0"
+  }
+}
