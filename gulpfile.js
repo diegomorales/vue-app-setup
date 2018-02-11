@@ -1,10 +1,15 @@
-let path = require('path'),
-    del = require('del'),
+let del = require('del'),
     gulp = require('gulp'),
     browser = require('browser-sync'),
     webpack = require('webpack'),
     webpackConfig = require('./webpack.config'),
-    yargs = require('yargs');
+    modernizr = require('gulp-modernizr'),
+    uglify = require('gulp-uglify'),
+    yargs = require('yargs'),
+    webpackDevMiddleware = require('webpack-dev-middleware'),
+    webpackHotMiddleware = require('webpack-hot-middleware'),
+    isWatching = true,
+    compiler;
 
 // Set environment
 process.env.NODE_ENV = !!(yargs.argv.production) ? 'production' : 'development';
@@ -42,62 +47,58 @@ const reload = (done) => {
     done();
 };
 
-const startServer = () => browser.init({
-    server: {
-        baseDir: './build',
-        port: 3000
-    },
-    open: false
-});
-
-let bundler;
+const startServer = () => {
+    browser.init({
+        server: {
+            baseDir: paths.build,
+            middleware: [
+                webpackDevMiddleware(compiler, {
+                    publicPath: webpackConfig(paths).output.publicPath,
+                    stats: {
+                        colors: true,
+                        chunks: false,
+                        modules: false,
+                        modulesTrace: false
+                    }
+                }),
+                webpackHotMiddleware(compiler, {
+                    quiet: true
+                })
+            ],
+            port: 3000
+        },
+        open: false
+    });
+};
 
 const cleanBuild = () => del(paths.build);
 
 const buildJs = (done) => {
-    console.log(webpackConfig(paths));
-    // bundler = webpack(webpackConfig(paths));
-    webpack({
-        devtool: 'source-map',
-        entry: {
-            main: paths.devJs + 'main.js',
-        },
-        output: {
-            filename: 'main.js',
-            path: path.resolve(__dirname, paths.buildJs)
-        }
+    compiler = webpack(webpackConfig(paths));
 
-    }, (err, stats) => {
-        if (err) {
-            console.error(err.stack || err);
-            if (err.details) {
-                console.error(err.details);
-            }
-            return;
-        }
+    // if (isWatching) {
+    //     compiler.watch({}, webpackCallback)
+    // } else {
+    //     compiler.run(webpackCallback);
+    // }
 
-        const info = stats.toJson();
-
-        if (stats.hasErrors()) {
-            console.error(info.errors);
-        }
-
-        if (stats.hasWarnings()) {
-            console.warn(info.warnings)
-        }
-
-        // Log result...
-        console.log(stats.toString({
-            chunks: false,  // Makes the build much quieter
-            modules: false,
-            colors: true,    // Shows colors in the console
-            moduleTrace: false
-        }));
-
-        // browser.reload();
-        done();
-    });
     done();
+};
+
+const buildModernizr = () => {
+    return gulp.src([paths.devJs + '**/*.js', paths.devScss + '**/*.scss'])
+        .pipe(modernizr('modernizr-custom.js', {
+            options: [
+                'setClasses',
+                'addTest',
+                'html5printshiv',
+                'testProp',
+                'fnBind'
+            ],
+            excludeTests: ['hidden']
+        }))
+        .pipe(uglify())
+        .pipe(gulp.dest(paths.buildJs))
 };
 
 const copyAssets = () => {
@@ -107,6 +108,7 @@ const copyAssets = () => {
 
 const build = gulp.series(cleanBuild, gulp.parallel(
     copyAssets,
+    buildModernizr,
     buildJs
 ));
 
