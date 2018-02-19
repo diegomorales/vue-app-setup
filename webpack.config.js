@@ -1,7 +1,8 @@
 let path = require('path'),
     autoprefixer = require('autoprefixer'),
     webpack = require('webpack'),
-    HtmlWebpackPlugin = require('html-webpack-plugin');
+    HtmlWebpackPlugin = require('html-webpack-plugin'),
+    StylelintPlugin = require('stylelint-webpack-plugin');
 
 module.exports = (paths) => {
     return {
@@ -50,7 +51,15 @@ module.exports = (paths) => {
             new HtmlWebpackPlugin({
                 template: paths.dev + 'index.html',
                 filename: path.resolve(__dirname, paths.build + 'index.html')
+            }),
+            new StylelintPlugin({
+                files: [paths.devViews + '**/*.vue', paths.devScss + '**/*.scss']
             })
-        ]
+        ],
+        resolve: {
+            alias: {
+                'vue$': 'vue/dist/vue.min.js'
+            }
+        },
     }
 };

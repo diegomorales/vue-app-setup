@@ -8,7 +8,7 @@ let del = require('del'),
     yargs = require('yargs'),
     webpackDevMiddleware = require('webpack-dev-middleware'),
     webpackHotMiddleware = require('webpack-hot-middleware'),
-    isWatching = true,
+    history = require('connect-history-api-fallback'),
     compiler;
 
 // Set environment
@@ -18,9 +18,6 @@ const isProd = process.env.NODE_ENV === 'production';
 
 const paths = {
     dev: './app/',
-    get devPages() {
-        return this.dev + 'pages/';
-    },
     get devScss() {
         return this.dev + 'scss/';
     },
@@ -29,6 +26,9 @@ const paths = {
     },
     get devAssets() {
         return this.dev + 'assets/';
+    },
+    get devViews() {
+        return this.dev + 'views/';
     },
     build: './build/',
     get buildCss() {
@@ -42,6 +42,14 @@ const paths = {
     }
 };
 
+// Some files can't be hot releoaded.
+// List them here
+const filesToReload = [
+    paths.dev + 'index.html',
+    paths.devJs + 'app.js',
+    paths.devViews + 'app.vue'
+];
+
 const reload = (done) => {
     browser.reload();
     done();
@@ -52,6 +60,7 @@ const startServer = () => {
         server: {
             baseDir: paths.build,
             middleware: [
+                history(),
                 webpackDevMiddleware(compiler, {
                     publicPath: webpackConfig(paths).output.publicPath,
                     stats: {
@@ -75,12 +84,6 @@ const cleanBuild = () => del(paths.build);
 
 const buildJs = (done) => {
     compiler = webpack(webpackConfig(paths));
-
-    // if (isWatching) {
-    //     compiler.watch({}, webpackCallback)
-    // } else {
-    //     compiler.run(webpackCallback);
-    // }
 
     done();
 };
@@ -114,6 +117,8 @@ const build = gulp.series(cleanBuild, gulp.parallel(
 
 const watch = gulp.series(build, () => {
     startServer();
+
+    gulp.watch(filesToReload, reload);
 });
 
 gulp.task('default', watch);
