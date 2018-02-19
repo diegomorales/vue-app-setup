@@ -22,7 +22,7 @@ const router = new VueRouter({
     mode: 'history'
 });
 
-new Vue({
+new Vue({ // eslint-disable-line no-new
     el: '#app',
     router,
     render: (createElement) => createElement(App)

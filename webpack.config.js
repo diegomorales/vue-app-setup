@@ -17,6 +17,23 @@ module.exports = (paths) => {
         module: {
             rules: [
                 {
+                    enforce: 'pre',
+                    test: /\.vue$/,
+                    exclude: /node_modules/,
+                    loader: 'eslint-loader',
+                    options: {
+                        rules: {
+                            'indent': 'off'
+                        }
+                    }
+                },
+                {
+                    enforce: 'pre',
+                    test: /\.js/,
+                    exclude: /node_modules/,
+                    loader: 'eslint-loader'
+                },
+                {
                     test: /\.js$/,
                     exclude: /(node_modules)/,
                     use: [
