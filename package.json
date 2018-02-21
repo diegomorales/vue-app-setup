@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "gulp",
-    "build": "gulp build"
+    "build": "gulp build",
+    "prerender": "gulp prerender"
   },
   "author": "Diego Morales <diego.morales@gmx.net>",
   "license": "ISC",
@@ -28,6 +29,7 @@
     "html-webpack-plugin": "^2.30.1",
     "node-sass": "^4.7.2",
     "postcss-loader": "^2.1.0",
+    "prerender-spa-plugin": "^2.1.0",
     "sass-loader": "^6.0.6",
     "style-loader": "^0.20.1",
     "stylelint": "^8.4.0",

@@ -9,6 +9,7 @@ let del = require('del'),
     webpackHotMiddleware = require('webpack-hot-middleware'),
     history = require('connect-history-api-fallback'),
     isProd = false,
+    doPrerender = false,
     compiler;
 
 // Set default environment
@@ -60,7 +61,7 @@ const startServer = () => {
             middleware: [
                 history(),
                 webpackDevMiddleware(compiler, {
-                    publicPath: webpackConfig(paths).output.publicPath,
+                    publicPath: webpackConfig(paths, doPrerender).output.publicPath,
                     stats: {
                         colors: true,
                         chunks: false,
@@ -81,7 +82,7 @@ const startServer = () => {
 const cleanBuild = () => del(paths.build);
 
 const buildJs = (done) => {
-    compiler = webpack(webpackConfig(paths));
+    compiler = webpack(webpackConfig(paths, doPrerender));
 
     if (isProd) {
         compiler.run((err, stats) => {
@@ -151,8 +152,19 @@ const watch = gulp.series(build, () => {
 });
 
 gulp.task('default', watch);
+
 gulp.task('build', gulp.series((done) => {
     isProd = true;
+
+    // Set environment
+    process.env.NODE_ENV = 'production';
+
+    done();
+}, build));
+
+gulp.task('prerender', gulp.series((done) => {
+    isProd = true;
+    doPrerender = true;
 
     // Set environment
     process.env.NODE_ENV = 'production';

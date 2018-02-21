@@ -4,9 +4,10 @@ let path = require('path'),
     HtmlWebpackPlugin = require('html-webpack-plugin'),
     StylelintPlugin = require('stylelint-webpack-plugin'),
     ExtractTextPlugin = require('extract-text-webpack-plugin'),
-    UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+    UglifyJsPlugin = require('uglifyjs-webpack-plugin'),
+    PrerenderSpaPlugin = require('prerender-spa-plugin');
 
-module.exports = (paths) => {
+module.exports = (paths, doPrerender) => {
     let isProd = process.env.NODE_ENV === 'production',
         entry = [paths.devJs + 'app.js'],
         plugins = [
@@ -28,6 +29,13 @@ module.exports = (paths) => {
         plugins.push(new UglifyJsPlugin({
             sourceMap: true
         }));
+    }
+
+    if (doPrerender) {
+        plugins.push(new PrerenderSpaPlugin(
+            path.resolve(__dirname, paths.build),
+            ['/', '/example']
+        ));
     }
 
     return {
