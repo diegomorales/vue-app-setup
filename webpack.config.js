@@ -4,14 +4,30 @@ let path = require('path'),
     HtmlWebpackPlugin = require('html-webpack-plugin'),
     StylelintPlugin = require('stylelint-webpack-plugin');
 
-module.exports = (paths) => {
+module.exports = (paths, isWatching) => {
+    let isProd = process.env.NODE_ENV === 'production',
+        entry = [paths.devJs + 'app.js'],
+        plugins = [
+            new HtmlWebpackPlugin({
+                template: paths.dev + 'index.html',
+                filename: path.resolve(__dirname, paths.build + 'index.html')
+            }),
+            new StylelintPlugin({
+                files: [paths.devViews + '**/*.vue', paths.devScss + '**/*.scss']
+            })
+        ];
+
+    if (isWatching) {
+        entry = ['webpack/hot/dev-server', 'webpack-hot-middleware/client'].concat(entry);
+
+        plugins.push(new webpack.HotModuleReplacementPlugin());
+    }
+
     return {
-        devtool: 'source-map',
-        entry: ['webpack/hot/dev-server',
-            'webpack-hot-middleware/client',
-            paths.devJs + 'app.js'],
+        devtool: isWatching ? 'eval-source-map' : 'source-map',
+        entry: entry,
         output: {
-            filename: 'app.js',
+            filename: 'js/app.js',
             path: path.resolve(__dirname, paths.build)
         },
         module: {
@@ -63,19 +79,10 @@ module.exports = (paths) => {
                 }
             ]
         },
-        plugins: [
-            new webpack.HotModuleReplacementPlugin(),
-            new HtmlWebpackPlugin({
-                template: paths.dev + 'index.html',
-                filename: path.resolve(__dirname, paths.build + 'index.html')
-            }),
-            new StylelintPlugin({
-                files: [paths.devViews + '**/*.vue', paths.devScss + '**/*.scss']
-            })
-        ],
+        plugins: plugins,
         resolve: {
             alias: {
-                'vue$': 'vue/dist/vue.min.js'
+                'vue$': isProd ? 'vue/dist/vue.min.js' : 'vue/dist/vue.esm.js'
             }
         },
     }

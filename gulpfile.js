@@ -9,6 +9,7 @@ let del = require('del'),
     webpackDevMiddleware = require('webpack-dev-middleware'),
     webpackHotMiddleware = require('webpack-hot-middleware'),
     history = require('connect-history-api-fallback'),
+    isWatching = true,
     compiler;
 
 // Set environment
@@ -62,7 +63,7 @@ const startServer = () => {
             middleware: [
                 history(),
                 webpackDevMiddleware(compiler, {
-                    publicPath: webpackConfig(paths).output.publicPath,
+                    publicPath: webpackConfig(paths, isWatching).output.publicPath,
                     stats: {
                         colors: true,
                         chunks: false,
@@ -83,7 +84,37 @@ const startServer = () => {
 const cleanBuild = () => del(paths.build);
 
 const buildJs = (done) => {
-    compiler = webpack(webpackConfig(paths));
+    compiler = webpack(webpackConfig(paths, isWatching));
+
+    if (!isWatching) {
+        compiler.run((err, stats) => {
+            if (err) {
+                console.error(err.stack || err);
+                if (err.details) {
+                    console.error(err.details);
+                }
+                return;
+            }
+
+            const info = stats.toJson();
+
+            if (stats.hasErrors()) {
+                console.error(info.errors);
+            }
+
+            if (stats.hasWarnings()) {
+                console.warn(info.warnings)
+            }
+
+            // Log result...
+            console.log(stats.toString({
+                chunks: false,  // Makes the build much quieter
+                modules: false,
+                colors: true,    // Shows colors in the console
+                moduleTrace: false
+            }));
+        });
+    }
 
     done();
 };
@@ -118,7 +149,12 @@ const build = gulp.series(cleanBuild, gulp.parallel(
 const watch = gulp.series(build, () => {
     startServer();
 
+    gulp.watch([paths.devAssets + '**/*.*'], gulp.series(copyAssets, reload));
     gulp.watch(filesToReload, reload);
 });
 
 gulp.task('default', watch);
+gulp.task('build', gulp.series((done) => {
+    isWatching = false;
+    done();
+}, build));

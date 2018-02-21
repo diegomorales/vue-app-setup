@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "gulp"
+    "start": "gulp",
+    "build": "gulp build",
+    "build-prod": "gulp build --production"
   },
   "author": "Diego Morales <diego.morales@gmx.net>",
   "license": "ISC",
