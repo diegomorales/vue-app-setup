@@ -6,7 +6,7 @@ let path = require('path'),
     ExtractTextPlugin = require('extract-text-webpack-plugin'),
     UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
-module.exports = (paths, isWatching) => {
+module.exports = (paths) => {
     let isProd = process.env.NODE_ENV === 'production',
         entry = [paths.devJs + 'app.js'],
         plugins = [
@@ -19,23 +19,23 @@ module.exports = (paths, isWatching) => {
             })
         ];
 
-    if (isWatching) {
+    if (!isProd) {
         entry = ['webpack/hot/dev-server', 'webpack-hot-middleware/client'].concat(entry);
 
         plugins.push(new webpack.HotModuleReplacementPlugin());
     } else {
         plugins.push(new ExtractTextPlugin('css/app.css'));
-    }
-
-    if (isProd) {
-        plugins.push(new UglifyJsPlugin());
+        plugins.push(new UglifyJsPlugin({
+            sourceMap: true
+        }));
     }
 
     return {
-        devtool: isWatching ? 'eval-source-map' : 'source-map',
+        devtool: isProd ? 'source-map' : 'eval-source-map',
         entry: entry,
         output: {
             filename: 'js/app.js',
+            publicPath: '/',
             path: path.resolve(__dirname, paths.build)
         },
         module: {
@@ -75,9 +75,9 @@ module.exports = (paths, isWatching) => {
                         {
                             loader: 'vue-loader',
                             options: {
-                                extractCSS: !isWatching,
+                                extractCSS: isProd,
                                 cssModules: {
-                                    localIdentName: '[name]__[local]--[hash:base64]'
+                                    localIdentName: isProd ? '[hash:base64]' : '[name]__[local]--[hash:base64]'
                                 },
                                 postcss: [
                                     autoprefixer({browsers: ['last 2 versions']})

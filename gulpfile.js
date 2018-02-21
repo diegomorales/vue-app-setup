@@ -5,17 +5,14 @@ let del = require('del'),
     webpackConfig = require('./webpack.config'),
     modernizr = require('gulp-modernizr'),
     uglify = require('gulp-uglify'),
-    yargs = require('yargs'),
     webpackDevMiddleware = require('webpack-dev-middleware'),
     webpackHotMiddleware = require('webpack-hot-middleware'),
     history = require('connect-history-api-fallback'),
-    isWatching = true,
+    isProd = false,
     compiler;
 
-// Set environment
-process.env.NODE_ENV = !!(yargs.argv.production) ? 'production' : 'development';
-
-const isProd = process.env.NODE_ENV === 'production';
+// Set default environment
+process.env.NODE_ENV = 'development';
 
 const paths = {
     dev: './app/',
@@ -63,7 +60,7 @@ const startServer = () => {
             middleware: [
                 history(),
                 webpackDevMiddleware(compiler, {
-                    publicPath: webpackConfig(paths, isWatching).output.publicPath,
+                    publicPath: webpackConfig(paths).output.publicPath,
                     stats: {
                         colors: true,
                         chunks: false,
@@ -84,9 +81,9 @@ const startServer = () => {
 const cleanBuild = () => del(paths.build);
 
 const buildJs = (done) => {
-    compiler = webpack(webpackConfig(paths, isWatching));
+    compiler = webpack(webpackConfig(paths));
 
-    if (!isWatching) {
+    if (isProd) {
         compiler.run((err, stats) => {
             if (err) {
                 console.error(err.stack || err);
@@ -155,6 +152,10 @@ const watch = gulp.series(build, () => {
 
 gulp.task('default', watch);
 gulp.task('build', gulp.series((done) => {
-    isWatching = false;
+    isProd = true;
+
+    // Set environment
+    process.env.NODE_ENV = 'production';
+
     done();
 }, build));

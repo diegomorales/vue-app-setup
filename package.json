@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "gulp",
-    "build": "gulp build",
-    "build-prod": "gulp build --production"
+    "build": "gulp build"
   },
   "author": "Diego Morales <diego.morales@gmx.net>",
   "license": "ISC",
@@ -42,8 +41,7 @@
     "vue-template-compiler": "^2.5.13",
     "webpack": "^3.10.0",
     "webpack-dev-middleware": "^2.0.5",
-    "webpack-hot-middleware": "^2.21.0",
-    "yargs": "^11.0.0"
+    "webpack-hot-middleware": "^2.21.0"
   },
   "dependencies": {
     "mdn-polyfills": "^5.5.0",
