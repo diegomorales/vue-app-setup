@@ -2,7 +2,9 @@ let path = require('path'),
     autoprefixer = require('autoprefixer'),
     webpack = require('webpack'),
     HtmlWebpackPlugin = require('html-webpack-plugin'),
-    StylelintPlugin = require('stylelint-webpack-plugin');
+    StylelintPlugin = require('stylelint-webpack-plugin'),
+    ExtractTextPlugin = require('extract-text-webpack-plugin'),
+    UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = (paths, isWatching) => {
     let isProd = process.env.NODE_ENV === 'production',
@@ -21,6 +23,12 @@ module.exports = (paths, isWatching) => {
         entry = ['webpack/hot/dev-server', 'webpack-hot-middleware/client'].concat(entry);
 
         plugins.push(new webpack.HotModuleReplacementPlugin());
+    } else {
+        plugins.push(new ExtractTextPlugin('css/app.css'));
+    }
+
+    if (isProd) {
+        plugins.push(new UglifyJsPlugin());
     }
 
     return {
@@ -67,6 +75,7 @@ module.exports = (paths, isWatching) => {
                         {
                             loader: 'vue-loader',
                             options: {
+                                extractCSS: !isWatching,
                                 cssModules: {
                                     localIdentName: '[name]__[local]--[hash:base64]'
                                 },
