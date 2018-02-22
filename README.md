@@ -23,7 +23,7 @@ In the project root run
 
 This will build and run the docker image. And it opens a console to the docker image.
 
-	# It will lokk somthing like this
+	# It will look somthing like this
 	node@<some hash>:~/code$
 
 
