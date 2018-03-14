@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
 
-docker-compose up -d
-docker-compose exec app bash
+IMG_NAME=vue-app-setup
+
+if [[ "$(docker images -q $IMG_NAME 2> /dev/null)" == "" ]]; then
+  docker build -t $IMG_NAME .
+fi
+
+docker run -it -p 3000:3000 -p 3001:3001 -v $(pwd):/home/node/code $IMG_NAME bash
