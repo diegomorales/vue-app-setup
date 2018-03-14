@@ -62,16 +62,15 @@ const startServer = () => {
                 history(),
                 webpackDevMiddleware(compiler, {
                     publicPath: webpackConfig(paths, doPrerender).output.publicPath,
+                    logLevel: 'info',
                     stats: {
                         colors: true,
                         chunks: false,
                         modules: false,
-                        modulesTrace: false
+                        moduleTrace: false
                     }
                 }),
-                webpackHotMiddleware(compiler, {
-                    quiet: true
-                })
+                webpackHotMiddleware(compiler)
             ],
             port: 3000
         },

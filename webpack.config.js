@@ -21,7 +21,7 @@ module.exports = (paths, doPrerender) => {
         ];
 
     if (!isProd) {
-        entry = ['webpack/hot/dev-server', 'webpack-hot-middleware/client'].concat(entry);
+        entry = ['webpack-hot-middleware/client'].concat(entry);
 
         plugins.push(new webpack.HotModuleReplacementPlugin());
     } else {
