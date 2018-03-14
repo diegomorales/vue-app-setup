@@ -5,7 +5,7 @@
   "scripts": {
     "start": "gulp",
     "build": "npm install && gulp build",
-    "prerender": "gulp prerender"
+    "prerender": "npm install && gulp prerender"
   },
   "author": "Diego Morales <diego.morales@gmx.net>",
   "license": "ISC",
