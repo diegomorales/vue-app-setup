@@ -8,7 +8,9 @@ You can use this setup as a starting point for your project.
 
 - Setup runs in an docker image.
 - Uses gulp and webpack
-- Linting for JS and SCSS (with slighlty opinionated rules)
+- Styles in PostCSS with [precss](https://github.com/jonathantneal/precss) plugin
+- Eslint with [standardJs](https://standardjs.com/)
+- Stylelint with [standard config](https://github.com/stylelint/stylelint-config-standard)
 - browser-sync
 - HMR
 - vue-router
@@ -32,9 +34,6 @@ Now install all dependencies.
 	node@<some hash>:~/code$ npm install
 	
 To quit the docker console just type `exit` or press `CTRL-D`.
-
-**Note**: The docker container is still running in the background (check with `docker ps`).  
-To also stop the container run `docker-compose down`. 
 
 ## Commands
 Run these in the docker console.
