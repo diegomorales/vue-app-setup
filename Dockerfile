@@ -1,4 +1,4 @@
-FROM node:8.10
+FROM node:8.11
 
 RUN mkdir -p /home/node/code
 
