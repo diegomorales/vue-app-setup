@@ -1,14 +1,14 @@
 <template>
-    <div>
-        <h1>Simple vue app setup</h1>
+  <div>
+    <h1>Simple vue app setup</h1>
 
-        <nav>
-            <router-link to="/">Home</router-link>
-            <router-link to="/example">Example</router-link>
-        </nav>
+    <nav>
+      <router-link to="/">Home</router-link>
+      <router-link to="/example">Example</router-link>
+    </nav>
 
-        <router-view/>
-    </div>
+    <router-view/>
+  </div>
 </template>
 
 <script>
