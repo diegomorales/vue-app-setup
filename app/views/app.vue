@@ -15,6 +15,6 @@
   export default {}
 </script>
 
-<style lang="pcss">
+<style>
 
 </style>
