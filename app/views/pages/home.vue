@@ -6,6 +6,6 @@
   </div>
 </template>
 
-<style lang="pcss">
+<style lang="scss">
 
 </style>

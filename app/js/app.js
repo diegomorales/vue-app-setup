@@ -4,6 +4,8 @@ import App from '../views/app.vue'
 import Home from '../views/pages/home.vue'
 import Example from '../views/pages/example.vue'
 
+import '../scss/global.scss'
+
 Vue.use(VueRouter)
 
 const routes = [

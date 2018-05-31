@@ -1,7 +1,6 @@
 let path = require('path'),
-  cssnext = require('postcss-cssnext'),
   atImport = require('postcss-import'),
-  precss = require('precss'),
+  autoprefixer = require('autoprefixer'),
   webpack = require('webpack'),
   HtmlWebpackPlugin = require('html-webpack-plugin'),
   StylelintPlugin = require('stylelint-webpack-plugin'),
@@ -9,21 +8,27 @@ let path = require('path'),
   UglifyJsPlugin = require('uglifyjs-webpack-plugin'),
   PrerenderSpaPlugin = require('prerender-spa-plugin')
 
-module.exports = (paths, doPrerender) => {
-  let isProd = process.env.NODE_ENV === 'production',
-    entry = [paths.devJs + 'app.js'],
-    plugins = [
-      new HtmlWebpackPlugin({
-        template: paths.dev + 'index.html',
-        filename: path.resolve(__dirname, paths.build + 'index.html')
-      }),
-      new StylelintPlugin({
-        files: [paths.devViews + '**/*.vue', paths.devPcss + '**/*.pcss']
-      })
-    ]
+module.exports = (paths) => {
+  const isProd = process.env.NODE_ENV === 'production'
+  const doPrerender = process.env.PRERENDER === 'true'
+
+  let entry = [paths.devJs + 'app.js']
+  let plugins = [
+    new HtmlWebpackPlugin({
+      template: paths.dev + 'index.html',
+      filename: path.resolve(__dirname, paths.build + 'index.html')
+    }),
+    new StylelintPlugin({
+      emitErrors: false,
+      files: [paths.devViews + '**/*.vue', paths.devScss + '**/*.scss']
+    })
+  ]
+  let postCssPlugins = [
+    autoprefixer({browsers: ['last 2 versions']})
+  ]
 
   if (!isProd) {
-    entry = ['webpack-hot-middleware/client'].concat(entry)
+    entry = ['webpack-hot-middleware/client?overlay=false'].concat(entry)
 
     plugins.push(new webpack.HotModuleReplacementPlugin())
   } else {
@@ -56,6 +61,7 @@ module.exports = (paths, doPrerender) => {
           exclude: /node_modules/,
           loader: 'eslint-loader',
           options: {
+            emitWarning: true,
             rules: {
               'indent': 'off'
             }
@@ -80,6 +86,26 @@ module.exports = (paths, doPrerender) => {
           ]
         },
         {
+          test: /\.scss$/,
+          use: [
+            {
+              loader: 'style-loader'
+            },
+            {
+              loader: 'css-loader'
+            },
+            {
+              loader: 'postcss-loader',
+              options: {
+                plugins: postCssPlugins
+              }
+            },
+            {
+              loader: 'sass-loader'
+            }
+          ]
+        },
+        {
           test: /\.vue$/,
           use: [
             {
@@ -89,11 +115,7 @@ module.exports = (paths, doPrerender) => {
                 cssModules: {
                   localIdentName: isProd ? '[hash:base64]' : '[name]__[local]--[hash:base64]'
                 },
-                postcss: [
-                  atImport(),
-                  precss(),
-                  cssnext({browsers: ['last 2 versions']})
-                ]
+                postcss: postCssPlugins
               }
             }
           ]
