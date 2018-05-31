@@ -8,9 +8,9 @@ You can use this setup as a starting point for your project.
 
 - Setup runs in an docker image.
 - Uses gulp and webpack
-- Styles in PostCSS with [precss](https://github.com/jonathantneal/precss) plugin
+- Styles in Sass
 - Eslint with [standardJs](https://standardjs.com/)
-- Stylelint with [standard config](https://github.com/stylelint/stylelint-config-standard)
+- Stylelint
 - browser-sync
 - HMR
 - vue-router
