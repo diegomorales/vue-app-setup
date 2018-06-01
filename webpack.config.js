@@ -1,18 +1,19 @@
-let path = require('path'),
-  atImport = require('postcss-import'),
-  autoprefixer = require('autoprefixer'),
-  webpack = require('webpack'),
-  HtmlWebpackPlugin = require('html-webpack-plugin'),
-  StylelintPlugin = require('stylelint-webpack-plugin'),
-  ExtractTextPlugin = require('extract-text-webpack-plugin'),
-  UglifyJsPlugin = require('uglifyjs-webpack-plugin'),
-  PrerenderSpaPlugin = require('prerender-spa-plugin')
+const path = require('path')
+const autoprefixer = require('autoprefixer')
+const cssnano = require('cssnano')
+const webpack = require('webpack')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const StylelintPlugin = require('stylelint-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const PrerenderSpaPlugin = require('prerender-spa-plugin')
 
 module.exports = (paths) => {
   const isProd = process.env.NODE_ENV === 'production'
   const doPrerender = process.env.PRERENDER === 'true'
 
   let entry = [paths.devJs + 'app.js']
+
   let plugins = [
     new HtmlWebpackPlugin({
       template: paths.dev + 'index.html',
@@ -23,24 +24,27 @@ module.exports = (paths) => {
       files: [paths.devViews + '**/*.vue', paths.devScss + '**/*.scss']
     })
   ]
+
   let postCssPlugins = [
     autoprefixer({browsers: ['last 2 versions']})
   ]
 
-  if (!isProd) {
-    entry = ['webpack-hot-middleware/client?overlay=false'].concat(entry)
-
-    plugins.push(new webpack.HotModuleReplacementPlugin())
-  } else {
+  if (isProd) {
     plugins.push(new ExtractTextPlugin('css/app.css'))
     plugins.push(new UglifyJsPlugin({
       sourceMap: true
     }))
+    postCssPlugins.push(cssnano())
+  } else {
+    entry = ['webpack-hot-middleware/client?overlay=false'].concat(entry)
+    plugins.push(new webpack.HotModuleReplacementPlugin())
   }
 
   if (doPrerender) {
     plugins.push(new PrerenderSpaPlugin(
       path.resolve(__dirname, paths.build),
+
+      // These are example paths.
       ['/', '/example']
     ))
   }
@@ -87,23 +91,39 @@ module.exports = (paths) => {
         },
         {
           test: /\.scss$/,
-          use: [
-            {
-              loader: 'style-loader'
-            },
-            {
-              loader: 'css-loader'
-            },
-            {
-              loader: 'postcss-loader',
-              options: {
-                plugins: postCssPlugins
+          use: isProd ? ExtractTextPlugin.extract({
+            use: [
+              {
+                loader: 'css-loader'
+              },
+              {
+                loader: 'postcss-loader',
+                options: {
+                  plugins: postCssPlugins
+                }
+              },
+              {
+                loader: 'sass-loader'
               }
-            },
-            {
-              loader: 'sass-loader'
-            }
-          ]
+            ]
+            })
+            : [
+              {
+                loader: 'style-loader'
+              },
+              {
+                loader: 'css-loader'
+              },
+              {
+                loader: 'postcss-loader',
+                options: {
+                  plugins: postCssPlugins
+                }
+              },
+              {
+                loader: 'sass-loader'
+              }
+            ]
         },
         {
           test: /\.vue$/,

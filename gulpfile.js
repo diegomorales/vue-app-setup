@@ -1,17 +1,17 @@
-const gulp = require('gulp');
+const gulp = require('gulp')
 
 // Tasks
-const paths = require('./tasks/paths');
-const reload = require('./tasks/reload');
-const cleanBuild = require('./tasks/clean-build');
-const copyAssets = require('./tasks/copy-assets');
-const startServer = require('./tasks/start-server');
-const buildJs = require('./tasks/build-js');
-const buildModernizr = require('./tasks/build-modernizr');
+const paths = require('./tasks/paths')
+const reload = require('./tasks/reload')
+const cleanBuild = require('./tasks/clean-build')
+const copyAssets = require('./tasks/copy-assets')
+const startServer = require('./tasks/start-server')
+const buildJs = require('./tasks/build-js')
+const buildModernizr = require('./tasks/build-modernizr')
 
 // Set default environment
-process.env.PRERENDER = 'false';
-process.env.NODE_ENV = 'development';
+process.env.PRERENDER = 'false'
+process.env.NODE_ENV = 'development'
 
 
 // Some files can't be hot reloaded.
@@ -46,9 +46,9 @@ gulp.task('build', gulp.series((done) => {
 }, build))
 
 gulp.task('prerender', gulp.series((done) => {
-  å
+
   // Set environment
-  process.env.PRERENDER = 'true';
+  process.env.PRERENDER = 'true'
   process.env.NODE_ENV = 'production'
 
   done()

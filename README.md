@@ -8,7 +8,7 @@ You can use this setup as a starting point for your project.
 
 - Setup runs in an docker image.
 - Uses gulp and webpack
-- Styles in Sass
+- Sass
 - Eslint with [standardJs](https://standardjs.com/)
 - Stylelint
 - browser-sync
