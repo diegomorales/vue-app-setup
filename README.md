@@ -7,7 +7,7 @@ You can use this setup as a starting point for your project.
 ## Features
 
 - Setup runs in an docker image.
-- Uses gulp and webpack
+- Uses gulp v4 and webpack 4.x
 - Sass
 - Eslint with [standardJs](https://standardjs.com/)
 - Stylelint
@@ -15,7 +15,7 @@ You can use this setup as a starting point for your project.
 - HMR
 - vue-router
 - Build task
-- Prerendering task
+- Prerendering task (uses [prerender-spa-plugin](https://github.com/chrisvfritz/prerender-spa-plugin) )
 
 ## Getting started
 

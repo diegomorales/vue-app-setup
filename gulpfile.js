@@ -11,10 +11,9 @@ const buildModernizr = require('./tasks/build-modernizr')
 
 // Set default environment
 process.env.PRERENDER = 'false'
-process.env.NODE_ENV = 'development'
+process.env.NODE_ENV = 'production'
 
-
-// Some files can't be hot reloaded.
+// Some files can't be hot-reloaded.
 // List them here
 const filesToReload = [
   paths.dev + 'index.html',
@@ -35,21 +34,17 @@ const watch = gulp.series(build, () => {
   gulp.watch(filesToReload, reload)
 })
 
-gulp.task('default', watch)
-
-gulp.task('build', gulp.series((done) => {
-
+gulp.task('default', gulp.series((done) => {
   // Set environment
-  process.env.NODE_ENV = 'production'
-
+  process.env.NODE_ENV = 'development'
   done()
-}, build))
+}, watch))
+
+gulp.task('build', build)
 
 gulp.task('prerender', gulp.series((done) => {
-
   // Set environment
   process.env.PRERENDER = 'true'
-  process.env.NODE_ENV = 'production'
 
   done()
 }, build))

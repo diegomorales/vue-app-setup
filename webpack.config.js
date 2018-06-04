@@ -1,14 +1,16 @@
 const path = require('path')
+const paths = require('./tasks/paths')
 const autoprefixer = require('autoprefixer')
-const cssnano = require('cssnano')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const StylelintPlugin = require('stylelint-webpack-plugin')
-const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 const PrerenderSpaPlugin = require('prerender-spa-plugin')
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
 
-module.exports = (paths) => {
+module.exports = () => {
   const isProd = process.env.NODE_ENV === 'production'
   const doPrerender = process.env.PRERENDER === 'true'
 
@@ -16,25 +18,57 @@ module.exports = (paths) => {
 
   let plugins = [
     new HtmlWebpackPlugin({
+      minify: isProd,
       template: paths.dev + 'index.html',
       filename: path.resolve(__dirname, paths.build + 'index.html')
     }),
     new StylelintPlugin({
       emitErrors: false,
       files: [paths.devViews + '**/*.vue', paths.devScss + '**/*.scss']
+    }),
+    new VueLoaderPlugin(),
+    new OptimizeCssAssetsPlugin({
+      cssProcessorOptions: {discardComments: {removeAll: true}}
     })
   ]
 
-  let postCssPlugins = [
-    autoprefixer({browsers: ['last 2 versions']})
+  let styleLoaders = [
+    'vue-style-loader',
+    {
+      loader: 'css-loader',
+      options: {
+        modules: true,
+        localIdentName: isProd ? '[hash:base64]' : '[name]__[local]--[hash:base64]'
+      }
+    },
+    {
+      loader: 'postcss-loader',
+      options: {
+        plugins: [
+          autoprefixer({browsers: ['last 2 versions']})
+        ]
+      }
+    },
+    {
+      loader: 'sass-loader'
+    }
   ]
 
   if (isProd) {
-    plugins.push(new ExtractTextPlugin('css/app.css'))
+    plugins.push(new MiniCssExtractPlugin({
+      filename: '[contenthash].css'
+    }))
     plugins.push(new UglifyJsPlugin({
+      uglifyOptions: {
+        output: {
+          comments: false
+        }
+      },
       sourceMap: true
     }))
-    postCssPlugins.push(cssnano())
+    styleLoaders[0] = {
+      loader: MiniCssExtractPlugin.loader
+    }
   } else {
     entry = ['webpack-hot-middleware/client?overlay=false'].concat(entry)
     plugins.push(new webpack.HotModuleReplacementPlugin())
@@ -44,12 +78,13 @@ module.exports = (paths) => {
     plugins.push(new PrerenderSpaPlugin(
       path.resolve(__dirname, paths.build),
 
-      // These are example paths.
+      // Set the paths you want prerendered here.
       ['/', '/example']
     ))
   }
 
   return {
+    mode: process.env.NODE_ENV,
     devtool: isProd ? 'source-map' : 'eval-source-map',
     entry: entry,
     output: {
@@ -78,6 +113,14 @@ module.exports = (paths) => {
           loader: 'eslint-loader'
         },
         {
+          test: /\.vue$/,
+          use: [
+            {
+              loader: 'vue-loader'
+            }
+          ]
+        },
+        {
           test: /\.js$/,
           exclude: /(node_modules)/,
           use: [
@@ -91,54 +134,7 @@ module.exports = (paths) => {
         },
         {
           test: /\.scss$/,
-          use: isProd ? ExtractTextPlugin.extract({
-            use: [
-              {
-                loader: 'css-loader'
-              },
-              {
-                loader: 'postcss-loader',
-                options: {
-                  plugins: postCssPlugins
-                }
-              },
-              {
-                loader: 'sass-loader'
-              }
-            ]
-            })
-            : [
-              {
-                loader: 'style-loader'
-              },
-              {
-                loader: 'css-loader'
-              },
-              {
-                loader: 'postcss-loader',
-                options: {
-                  plugins: postCssPlugins
-                }
-              },
-              {
-                loader: 'sass-loader'
-              }
-            ]
-        },
-        {
-          test: /\.vue$/,
-          use: [
-            {
-              loader: 'vue-loader',
-              options: {
-                extractCSS: isProd,
-                cssModules: {
-                  localIdentName: isProd ? '[hash:base64]' : '[name]__[local]--[hash:base64]'
-                },
-                postcss: postCssPlugins
-              }
-            }
-          ]
+          use: styleLoaders
         }
       ]
     },
@@ -147,6 +143,6 @@ module.exports = (paths) => {
       alias: {
         'vue$': isProd ? 'vue/dist/vue.min.js' : 'vue/dist/vue.esm.js'
       }
-    },
+    }
   }
 }

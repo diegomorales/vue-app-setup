@@ -1,6 +1,6 @@
-const browser = require('browser-sync');
+const browser = require('browser-sync')
 
-module.exports = function reload(done) {
-  browser.reload();
-  done();
-};
+module.exports = function reload (done) {
+  browser.reload()
+  done()
+}
