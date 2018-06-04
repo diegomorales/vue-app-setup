@@ -27,7 +27,7 @@ const build = gulp.series(cleanBuild, gulp.parallel(
   buildJs
 ))
 
-const watch = gulp.series(build, () => {
+const watch = gulp.series(build, function watch () {
   startServer()
 
   gulp.watch([paths.devAssets + '**/*.*'], gulp.series(copyAssets, reload))
