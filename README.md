@@ -2,7 +2,7 @@
 
 An opinionated setup for creating vue applications.
 
-You can use this setup as a starting point for your project.
+You can use this setup as a starting point for your own project.
 
 ## Features
 
@@ -40,9 +40,9 @@ Run these in the docker console.
 
 - `npm start`: For development. Starts gulp watchers and webpack in watch mode.
 - `npm run build`: Makes a production build
-- `npm run prerender`: Makes a production build and prerenders given paths
+- `npm run prerender`: Makes a production build and prerenders given paths (in `webpack.config.js`)
 
 
 ## Notes 
 - Always install or uninstall npm packages from the docker console.
-- docker is only used here for development. This way it's not necessary to have node/npm installed globally. But obviously you can still run this setup without docker. (I'd recommend node v8+).
+- docker is only used here for development. This way it's not necessary to have node/npm installed globally. But obviously you can still run this setup without docker. (I'd recommend node v10+).
